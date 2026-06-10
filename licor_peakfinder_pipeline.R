@@ -1,11 +1,11 @@
 # LICOR CO2 injection peak extraction pipeline
 # Purpose:
 #   1) Read a LICOR .txt output file
-#   2) Detect sequential CO2 injection peaks
-#   3) Extract peak maximum CO2 and instantaneous H2O at the peak maximum
-#   4) Calculate baseline-corrected CO2 area under each peak
-#   5) Calculate average H2O across each detected peak width
-#   6) Export a polished CSV summary
+#   2) Detect sequential CO2 injection peaks using idealized smooth data.
+#   3) Extract peak maximum CO2 and instantaneous H2O at the peak maximum using raw data.
+#   4) Calculate baseline-corrected CO2 area under each peak using raw data.
+#   5) Calculate average H2O across each detected peak width using raw data.
+#   6) Export a polished CSV summary to output folder
 
 # ---------------------------
 # User settings
@@ -21,11 +21,11 @@ co2_col <- "CO2_(umol_mol-1)"
 h2o_col <- "H2O_(mmol_mol-1)"
 
 # Peak detection parameters. Tune these if needed.
-smooth_window <- 5        # odd integer; light smoothing for noisy CO2 trace
-threshold_mad <- 4        # higher = fewer peaks; lower = more sensitive
-min_prominence <- 8       # minimum CO2 rise above local baseline, in umol mol-1
-min_peak_gap_sec <- 8     # minimum time between separate injections, in seconds
-edge_fraction <- 0.08     # peak edges where signal falls to baseline + 8% of peak height
+smooth_window <- 5        # needs odd integer; light smoothing for noisy CO2 trace; basically looking for how many consecutive timepoints of rising CO2 are needed to be considered a potential peak
+threshold_mad <- 4        # What we are actually considering a peak. This means little jitters near baseline are not analyzed. higher = fewer peaks; lower = more sensitive
+min_prominence <- 8       # how high does a peak need to be before we assume it is an injection. minimum CO2 rise above local baseline, in umol mol-1
+min_peak_gap_sec <- 8     # What is the minimum time between separate injections, in seconds. disregards small rises until a certain time period has elapsed since the last injection.
+edge_fraction <- 0.08     # measuring the bounds of what is "peak" vs. baseline. peak edges where signal falls to baseline + 8% of peak height
 
 # TRUE = integrate CO2 above the local baseline, usually best for injection peaks.
 # FALSE = integrate raw CO2 values.
